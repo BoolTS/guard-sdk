@@ -1,0 +1,50 @@
+{
+    "author": "Trần Đức Tâm (Neo)",
+    "bugs": {
+        "url": "https://github.com/BoolTS/guard-sdk/issues"
+    },
+    "dependencies": {
+        "jose": "^6.1.0",
+        "reflect-metadata": "^0.2.2",
+        "zod": "^4.1.9"
+    },
+    "devDependencies": {
+        "@types/bun": "latest",
+        "typescript": "^5.9.2"
+    },
+    "files": [
+        "./dist",
+        "./src"
+    ],
+    "homepage": "https://github.com/BoolTS/guard-sdk#readme",
+    "keywords": [
+        "bool",
+        "typescript",
+        "ts",
+        "bun",
+        "framework",
+        "guards",
+        "security",
+        "SDK"
+    ],
+    "license": "MIT",
+    "main": "./dist/index.js",
+    "name": "@bool-ts/guard-sdk",
+    "peerDependencies": {
+        "@bool-ts/core": "^2.0.3"
+    },
+    "private": false,
+    "publishConfig": {
+        "access": "public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/BoolTS/guard-sdk.git"
+    },
+    "scripts": {
+        "build": "tsc --emitDeclarationOnly && bun run app.build.ts",
+        "test": "bun --hot run __test/index.ts"
+    },
+    "types": "./dist/index.d.ts",
+    "version": "1.0.0-beta.1"
+}
