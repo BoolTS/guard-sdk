@@ -1,7 +1,7 @@
 import type { IContext, IMiddleware } from "@bool-ts/core";
 import type { IClient, TAuthState } from "../interfaces/client.interface";
 
-import { Context, Inject, RequestHeaders } from "@bool-ts/core";
+import { Middleware as BoolMiddleware, Context, Inject, RequestHeaders } from "@bool-ts/core";
 import { object, string } from "zod/v4";
 import { Keys } from "../constants";
 import { Client } from "../instances";
@@ -23,6 +23,7 @@ const headersSchema = object({
 /**
  * Bool guard middleware for Bool Typescript framework
  */
+@BoolMiddleware()
 export class Middleware implements IMiddleware {
     /**
      *
