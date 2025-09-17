@@ -5,8 +5,7 @@
       "name": "@bool-ts/guard-sdk",
       "dependencies": {
         "jose": "^6.1.0",
-        "reflect-metadata": "^0.2.2",
-        "zod": "^4.1.8",
+        "zod": "^4.1.9",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -14,6 +13,7 @@
       },
       "peerDependencies": {
         "@bool-ts/core": "^2.0.3",
+        "reflect-metadata": "^0.2.2",
       },
     },
   },
