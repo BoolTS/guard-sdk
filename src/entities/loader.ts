@@ -16,5 +16,3 @@ export const loader = async (clientConfigs: TClientConfigs, clientOptions?: TCli
 
     return [Keys.guardClient, boolGuardClient];
 };
-
-export default loader;
