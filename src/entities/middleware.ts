@@ -4,7 +4,6 @@ import type { IClient, TAuthState } from "../interfaces/client.interface";
 import { Middleware as BoolMiddleware, Context, Inject, RequestHeaders } from "@bool-ts/core";
 import { object, string } from "zod/v4";
 import { Keys } from "../constants";
-import { Client } from "../instances";
 
 const headersSchema = object({
     authorization: string()
@@ -30,7 +29,7 @@ export class Middleware implements IMiddleware {
      * @param tenantAppModesService
      */
     constructor(
-        @Inject(Client)
+        @Inject(Keys.guardClient)
         private readonly clientInstance: IClient
     ) {}
 
