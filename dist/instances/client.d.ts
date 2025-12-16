@@ -1,15 +1,18 @@
-import type { IClient, TClientConfigs, TClientOptions } from "../interfaces/client.interface";
+import type { IClient, TClientCredential, TClientDefinition, TClientOptions } from "../interfaces/client.interface";
 export declare class Client implements IClient {
     #private;
-    private readonly configs;
-    private readonly options?;
+    private readonly params;
     private token;
     /**
      * Initialize BoolGuard client instance
      * @param configs
      * @param options
      */
-    constructor(configs: TClientConfigs, options?: TClientOptions | undefined);
+    constructor(params: Readonly<{
+        credential: TClientCredential;
+        definition?: TClientDefinition;
+        options?: TClientOptions;
+    }>);
     /**
      * Sign JWT token with Ed25519 algorithm
      * @returns

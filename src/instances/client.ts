@@ -1,5 +1,10 @@
 import type { TApiResponse } from "../interfaces/base";
-import type { IClient, TClientConfigs, TClientOptions } from "../interfaces/client.interface";
+import type {
+    IClient,
+    TClientCredential,
+    TClientDefinition,
+    TClientOptions
+} from "../interfaces/client.interface";
 
 import { SignJWT } from "jose";
 import { email } from "zod/v4";
@@ -7,6 +12,7 @@ import { Enums } from "../constants";
 
 export class Client implements IClient {
     readonly #baseUri = Enums.ETokenAudiences.SYSTEM;
+    readonly #defaultVersion: number = 1;
 
     private token: string | undefined;
 
@@ -16,8 +22,11 @@ export class Client implements IClient {
      * @param options
      */
     constructor(
-        private readonly configs: TClientConfigs,
-        private readonly options?: TClientOptions
+        private readonly params: Readonly<{
+            credential: TClientCredential;
+            definition?: TClientDefinition;
+            options?: TClientOptions;
+        }>
     ) {}
 
     /**
@@ -25,8 +34,16 @@ export class Client implements IClient {
      * @returns
      */
     async signToken() {
+        const {
+            params: {
+                credential: { tenantId, appId, modeId, secretKey },
+                options
+            }
+        } = this;
+
         try {
-            const rawKey = new Uint8Array(Buffer.from(this.configs.secretKey, "base64"));
+            const rawKey = new Uint8Array(Buffer.from(secretKey, "base64"));
+
             const privateKey = await crypto.subtle.importKey(
                 "raw",
                 rawKey,
@@ -36,10 +53,10 @@ export class Client implements IClient {
             );
 
             const jwt = await new SignJWT({
-                tenantId: this.configs.tenantId,
-                appId: this.configs.appId,
-                modeId: this.configs.modeId,
-                iss: this.configs.tenantId,
+                tenantId: tenantId,
+                appId: appId,
+                modeId: modeId,
+                iss: tenantId,
                 aud: Enums.ETokenAudiences.SYSTEM
             })
                 .setProtectedHeader({ alg: "HS512" })
@@ -49,7 +66,7 @@ export class Client implements IClient {
 
             return jwt;
         } catch (error) {
-            if (this.options?.logs) {
+            if (options?.logs) {
                 console.error("[BoolGuard] Sign token error:", error);
             }
 
@@ -63,17 +80,27 @@ export class Client implements IClient {
      * @returns
      */
     async ping() {
-        try {
-            const authToken = this.token || (await this.signToken());
+        const {
+            token,
+            params: {
+                credential: { tenantId, appId, modeId },
+                options
+            }
+        } = this;
 
+        try {
+            const authToken = token || (await this.signToken());
             const requestHeaders = new Headers();
-            requestHeaders.append("X-Tenant-ID", this.configs.tenantId);
-            requestHeaders.append("X-App-ID", this.configs.appId);
-            requestHeaders.append("X-Mode-ID", this.configs.modeId);
+
+            requestHeaders.append("X-Tenant-ID", tenantId);
+            requestHeaders.append("X-App-ID", appId);
+            requestHeaders.append("X-Mode-ID", modeId);
             requestHeaders.append("Authorization", `Bearer ${authToken}`);
 
             const response = await fetch(
-                `${this.#baseUri}/v${this.options?.version}/tenant-app-modes/ping`,
+                `${this.#baseUri}/v${
+                    options?.version || this.#defaultVersion
+                }/tenant-app-modes/ping`,
                 {
                     method: "GET",
                     headers: requestHeaders
@@ -86,7 +113,7 @@ export class Client implements IClient {
 
             return response.ok;
         } catch (error) {
-            if (this.options?.logs) {
+            if (options?.logs) {
                 console.error("[BoolGuard] Ping error:", error);
             }
 
@@ -106,28 +133,38 @@ export class Client implements IClient {
     }: Parameters<IClient["createPlainAccount"]>[number]): ReturnType<
         IClient["createPlainAccount"]
     > {
-        try {
-            const authToken = this.token || (await this.signToken());
+        const {
+            token,
+            params: {
+                credential: { tenantId, appId, modeId },
+                options
+            }
+        } = this;
 
+        try {
+            const authToken = token || (await this.signToken());
             const requestHeaders = new Headers();
-            requestHeaders.append("X-Tenant-ID", this.configs.tenantId);
-            requestHeaders.append("X-App-ID", this.configs.appId);
-            requestHeaders.append("X-Mode-ID", this.configs.modeId);
+
+            requestHeaders.append("X-Tenant-ID", tenantId);
+            requestHeaders.append("X-App-ID", appId);
+            requestHeaders.append("X-Mode-ID", modeId);
             requestHeaders.append("Authorization", `Bearer ${authToken}`);
             requestHeaders.append("Content-Type", "application/json");
 
             const response = await fetch(
-                `${this.#baseUri}/v${this.options?.version}/tenant-app-mode-accounts`,
+                `${this.#baseUri}/v${
+                    options?.version || this.#defaultVersion
+                }/tenant-app-mode-accounts`,
                 {
                     method: "POST",
                     headers: requestHeaders,
                     body: JSON.stringify({
-                        data: {
+                        data: Object.freeze({
                             type: "plain",
                             identity: identity,
                             password: password,
                             metadata: metadata
-                        }
+                        })
                     })
                 }
             );
@@ -136,14 +173,16 @@ export class Client implements IClient {
                 throw await response.json();
             }
 
-            const { data } = (await response.json()) as TApiResponse<IClient["createPlainAccount"]>;
+            const { data } = (await response.json()) as TApiResponse<
+                IClient["createPlainAccount"]
+            >;
 
             return Object.freeze({
                 account: data.account,
                 credential: data.credential
             });
         } catch (error) {
-            if (this.options?.logs) {
+            if (options?.logs) {
                 console.error("[BoolGuard] Create plain account error:", error);
             }
 
@@ -163,28 +202,38 @@ export class Client implements IClient {
     }: Parameters<IClient["createEmailAccount"]>[number]): ReturnType<
         IClient["createEmailAccount"]
     > {
-        try {
-            const authToken = this.token || (await this.signToken());
+        const {
+            token,
+            params: {
+                credential: { tenantId, appId, modeId },
+                options
+            }
+        } = this;
 
+        try {
+            const authToken = token || (await this.signToken());
             const requestHeaders = new Headers();
-            requestHeaders.append("X-Tenant-ID", this.configs.tenantId);
-            requestHeaders.append("X-App-ID", this.configs.appId);
-            requestHeaders.append("X-Mode-ID", this.configs.modeId);
+
+            requestHeaders.append("X-Tenant-ID", tenantId);
+            requestHeaders.append("X-App-ID", appId);
+            requestHeaders.append("X-Mode-ID", modeId);
             requestHeaders.append("Authorization", `Bearer ${authToken}`);
             requestHeaders.append("Content-Type", "application/json");
 
             const response = await fetch(
-                `${this.#baseUri}/v${this.options?.version}/tenant-app-mode-accounts`,
+                `${this.#baseUri}/v${
+                    options?.version || this.#defaultVersion
+                }/tenant-app-mode-accounts`,
                 {
                     method: "POST",
                     headers: requestHeaders,
                     body: JSON.stringify({
-                        data: {
+                        data: Object.freeze({
                             type: "email",
                             identity: identity,
                             password: password,
                             metadata: metadata
-                        }
+                        })
                     })
                 }
             );
@@ -193,14 +242,16 @@ export class Client implements IClient {
                 throw await response.json();
             }
 
-            const { data } = (await response.json()) as TApiResponse<IClient["createEmailAccount"]>;
+            const { data } = (await response.json()) as TApiResponse<
+                IClient["createEmailAccount"]
+            >;
 
             return Object.freeze({
                 account: data.account,
                 credential: data.credential
             });
         } catch (error) {
-            if (this.options?.logs) {
+            if (options?.logs) {
                 console.error("[BoolGuard] Create email account error:", error);
             }
 
@@ -216,29 +267,41 @@ export class Client implements IClient {
     async authenticate({
         identity,
         password
-    }: Parameters<IClient["authenticate"]>[number]): ReturnType<IClient["authenticate"]> {
-        try {
-            const authToken = this.token || (await this.signToken());
-            const emailValidation = await email().safeParseAsync(identity);
+    }: Parameters<IClient["authenticate"]>[number]): ReturnType<
+        IClient["authenticate"]
+    > {
+        const {
+            token,
+            params: {
+                credential: { tenantId, appId, modeId },
+                options
+            }
+        } = this;
 
+        try {
+            const authToken = token || (await this.signToken());
+            const emailValidation = await email().safeParseAsync(identity);
             const requestHeaders = new Headers();
-            requestHeaders.append("X-Tenant-ID", this.configs.tenantId);
-            requestHeaders.append("X-App-ID", this.configs.appId);
-            requestHeaders.append("X-Mode-ID", this.configs.modeId);
+
+            requestHeaders.append("X-Tenant-ID", tenantId);
+            requestHeaders.append("X-App-ID", appId);
+            requestHeaders.append("X-Mode-ID", modeId);
             requestHeaders.append("Authorization", `Bearer ${authToken}`);
             requestHeaders.append("Content-Type", "application/json");
 
             const response = await fetch(
-                `${this.#baseUri}/v${this.options?.version}/tenant-app-mode-accounts/authenticate`,
+                `${this.#baseUri}/v${
+                    options?.version || this.#defaultVersion
+                }/tenant-app-mode-accounts/authenticate`,
                 {
                     method: "POST",
                     headers: requestHeaders,
                     body: JSON.stringify({
-                        data: {
+                        data: Object.freeze({
                             type: !emailValidation.success ? "plain" : "email",
                             identity: identity,
                             password: password
-                        }
+                        })
                     })
                 }
             );
@@ -247,7 +310,9 @@ export class Client implements IClient {
                 throw await response.json();
             }
 
-            const { data } = (await response.json()) as TApiResponse<IClient["authenticate"]>;
+            const { data } = (await response.json()) as TApiResponse<
+                IClient["authenticate"]
+            >;
 
             return Object.freeze({
                 account: data.account,
@@ -255,7 +320,7 @@ export class Client implements IClient {
                 token: data.token
             });
         } catch (error) {
-            if (this.options?.logs) {
+            if (options?.logs) {
                 console.error("[BoolGuard] Authenticate error:", error);
             }
 
@@ -269,26 +334,37 @@ export class Client implements IClient {
      */
     async verifyToken({
         token
-    }: Parameters<IClient["verifyToken"]>[number]): ReturnType<IClient["verifyToken"]> {
+    }: Parameters<IClient["verifyToken"]>[number]): ReturnType<
+        IClient["verifyToken"]
+    > {
+        const {
+            params: {
+                credential: { tenantId, appId, modeId },
+                options
+            }
+        } = this;
+
         try {
             const authToken = this.token || (await this.signToken());
-
             const requestHeaders = new Headers();
-            requestHeaders.append("X-Tenant-ID", this.configs.tenantId);
-            requestHeaders.append("X-App-ID", this.configs.appId);
-            requestHeaders.append("X-Mode-ID", this.configs.modeId);
+
+            requestHeaders.append("X-Tenant-ID", tenantId);
+            requestHeaders.append("X-App-ID", appId);
+            requestHeaders.append("X-Mode-ID", modeId);
             requestHeaders.append("Authorization", `Bearer ${authToken}`);
             requestHeaders.append("Content-Type", "application/json");
 
             const response = await fetch(
-                `${this.#baseUri}/v${this.options?.version}/tenant-app-mode-accounts/verify`,
+                `${this.#baseUri}/v${
+                    options?.version || this.#defaultVersion
+                }/tenant-app-mode-accounts/verify`,
                 {
                     method: "POST",
                     headers: requestHeaders,
                     body: JSON.stringify({
-                        data: {
+                        data: Object.freeze({
                             token: token
-                        }
+                        })
                     })
                 }
             );
@@ -297,14 +373,16 @@ export class Client implements IClient {
                 throw await response.json();
             }
 
-            const { data } = (await response.json()) as TApiResponse<IClient["verifyToken"]>;
+            const { data } = (await response.json()) as TApiResponse<
+                IClient["verifyToken"]
+            >;
 
             return Object.freeze({
                 account: data.account,
                 credential: data.credential
             });
         } catch (error) {
-            if (this.options?.logs) {
+            if (options?.logs) {
                 console.error("[BoolGuard] Verify token error:", error);
             }
 

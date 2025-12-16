@@ -1,17 +1,23 @@
+import type { defineResources } from "../definers";
 import type { IAccount, TDefaultAccountMetadata } from "./account.interface";
 import type { IAccountCredential } from "./accountCredential.interface";
 
-export type TClientConfigs = {
+export type TClientCredential = Readonly<{
     tenantId: string;
     appId: string;
     modeId: string;
     secretKey: string;
-};
+}>;
 
-export type TClientOptions = {
+export type TClientDefinition = Readonly<{
+    resources: ReturnType<typeof defineResources>["resources"];
+    policies: ReturnType<ReturnType<typeof defineResources>["definePolicies"]>;
+}>;
+
+export type TClientOptions = Readonly<{
     version?: 1;
     logs?: boolean;
-};
+}>;
 
 export interface IClient<
     TAccountMetadata extends TDefaultAccountMetadata = TDefaultAccountMetadata
@@ -36,14 +42,20 @@ export interface IClient<
             credential: IAccountCredential;
         }>
     >;
-    authenticate(args: { identity: string; password?: string | null }): Promise<{
+    authenticate(args: {
+        identity: string;
+        password?: string | null;
+    }): Promise<{
         token: string;
         account: IAccount<TAccountMetadata>;
         credential: IAccountCredential;
     }>;
     verifyToken(args: {
         token: string;
-    }): Promise<{ account: IAccount<TAccountMetadata>; credential: IAccountCredential }>;
+    }): Promise<{
+        account: IAccount<TAccountMetadata>;
+        credential: IAccountCredential;
+    }>;
 }
 
 export type TAuthState = {

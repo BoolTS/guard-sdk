@@ -1,10 +1,24 @@
-import type { TClientConfigs, TClientOptions } from "../interfaces/client.interface";
+import type {
+    TClientCredential,
+    TClientDefinition,
+    TClientOptions
+} from "../interfaces/client.interface";
 
 import { Keys } from "../constants";
 import { Client } from "../instances/client";
 
-export const loader = async (clientConfigs: TClientConfigs, clientOptions?: TClientOptions) => {
-    const boolGuardClient = new Client(clientConfigs, clientOptions);
+export type TLoaderParameters = {
+    credential: TClientCredential;
+    definition?: TClientDefinition;
+    options?: TClientOptions;
+};
+
+export const loader = async ({
+    credential,
+    definition,
+    options
+}: TLoaderParameters) => {
+    const boolGuardClient = new Client({ credential, definition, options });
 
     await boolGuardClient.signToken();
 

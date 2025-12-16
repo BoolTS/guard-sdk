@@ -1,15 +1,20 @@
+import type { defineResources } from "../definers";
 import type { IAccount, TDefaultAccountMetadata } from "./account.interface";
 import type { IAccountCredential } from "./accountCredential.interface";
-export type TClientConfigs = {
+export type TClientCredential = Readonly<{
     tenantId: string;
     appId: string;
     modeId: string;
     secretKey: string;
-};
-export type TClientOptions = {
+}>;
+export type TClientDefinition = Readonly<{
+    resources: ReturnType<typeof defineResources>["resources"];
+    policies: ReturnType<ReturnType<typeof defineResources>["definePolicies"]>;
+}>;
+export type TClientOptions = Readonly<{
     version?: 1;
     logs?: boolean;
-};
+}>;
 export interface IClient<TAccountMetadata extends TDefaultAccountMetadata = TDefaultAccountMetadata> {
     createPlainAccount(args: {
         identity: string;
