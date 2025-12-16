@@ -5,4 +5,4 @@ export type TLoaderParameters = {
     definition?: TClientDefinition;
     options?: TClientOptions;
 };
-export declare const loader: ({ credential, definition, options }: TLoaderParameters) => Promise<(symbol | Client)[]>;
+export declare const loader: ({ credential, definition, options }: TLoaderParameters) => Promise<[Symbol, Client]>;
