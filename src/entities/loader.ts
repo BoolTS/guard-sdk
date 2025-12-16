@@ -17,7 +17,7 @@ export const loader = async ({
     credential,
     definition,
     options
-}: TLoaderParameters): Promise<[Symbol, Client]> => {
+}: TLoaderParameters): Promise<[symbol, Client]> => {
     const boolGuardClient = new Client({ credential, definition, options });
 
     await boolGuardClient.signToken();
