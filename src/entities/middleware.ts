@@ -1,7 +1,12 @@
 import type { IContext, IMiddleware } from "@bool-ts/core";
 import type { IClient, TAuthState } from "../interfaces/client.interface";
 
-import { Middleware as BoolMiddleware, Context, Inject, RequestHeaders } from "@bool-ts/core";
+import {
+    Middleware as BoolMiddleware,
+    Context,
+    Inject,
+    RequestHeaders
+} from "@bool-ts/core";
 import { object, string } from "zod/v4";
 import { Keys } from "../constants";
 
@@ -44,7 +49,9 @@ export class Middleware implements IMiddleware {
         @RequestHeaders()
         requestHeaders: Headers
     ) {
-        const headersValidation = await headersSchema.safeParseAsync(requestHeaders.toJSON());
+        const headersValidation = await headersSchema.safeParseAsync(
+            requestHeaders.toJSON()
+        );
 
         if (!headersValidation.success) {
             return context.set(Keys.authState, undefined);
@@ -54,9 +61,10 @@ export class Middleware implements IMiddleware {
             } = headersValidation.data;
 
             try {
-                const { account, credential } = await this.clientInstance.verifyToken({
-                    token: token
-                });
+                const { account, credential } =
+                    await this.clientInstance.verifyToken({
+                        token: token
+                    });
 
                 const authState: TAuthState = Object.freeze({
                     account: account,

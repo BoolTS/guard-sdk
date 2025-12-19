@@ -50,9 +50,7 @@ export interface IClient<
         account: IAccount<TAccountMetadata>;
         credential: IAccountCredential;
     }>;
-    verifyToken(args: {
-        token: string;
-    }): Promise<{
+    verifyToken(args: { token: string }): Promise<{
         account: IAccount<TAccountMetadata>;
         credential: IAccountCredential;
     }>;

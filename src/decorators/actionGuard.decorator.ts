@@ -5,7 +5,8 @@ import { Keys } from "../constants";
 
 export const ActionGuard =
     <
-        const T extends readonly TResourceDefinition[] = readonly TResourceDefinition[],
+        const T extends readonly TResourceDefinition[] =
+            readonly TResourceDefinition[],
         K extends TConstructor<Object> | Object = Object
     >(
         options?: TActionGuardOptions<T>
