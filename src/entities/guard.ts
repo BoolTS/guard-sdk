@@ -14,7 +14,7 @@ export class Guard implements IGuard {
         authState: TAuthState
     ) {
         const actionMetadataKeys = Reflect.getOwnMetadataKeys(
-            routeModel.class.prototype,
+            routeModel.class,
             routeModel.funcName
         );
 
