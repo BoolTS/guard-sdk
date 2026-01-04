@@ -1,5 +1,7 @@
-import type { IGuard, THttpRouteModel } from "@bool-ts/core";
-import type { TAuthState } from "../interfaces/client.interface";
+import type { IContext, IGuard, THttpRouteModel } from "@bool-ts/core";
+import type { IClient } from "../interfaces/client.interface";
 export declare class Guard implements IGuard {
-    enforce(routeModel: THttpRouteModel, authState: TAuthState): boolean;
+    private readonly clientInstance;
+    constructor(clientInstance: IClient | undefined);
+    enforce(routeModel: THttpRouteModel, requestHeaders: Headers, context: IContext): Promise<boolean>;
 }
