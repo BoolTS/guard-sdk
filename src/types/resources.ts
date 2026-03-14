@@ -4,7 +4,7 @@ export type TResourceDefinition<
     T extends string = string,
     A extends TNonEmptyArray<string> = TNonEmptyArray<string>
 > = {
-    readonly type: T;
+    readonly alias: T;
     readonly actions: A;
     readonly [key: string]: unknown;
 };

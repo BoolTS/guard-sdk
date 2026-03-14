@@ -7,6 +7,7 @@ export const definePolicies = <const K extends readonly TPolicyDefinition[]>(
     policies: TEnforceUnique<K, "alias">
 ) => {
     if (
+        policies === `Duplicate key "alias" found` ||
         new Set([
             ...policies
                 .map((policy) =>

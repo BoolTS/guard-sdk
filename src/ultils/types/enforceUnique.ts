@@ -27,4 +27,7 @@ type HasDuplicate<
 export type TEnforceUnique<
     Arr extends readonly any[],
     K extends keyof Arr[number]
-> = HasDuplicate<Arr, K> extends true ? ["Duplicate key found"] : Arr;
+> =
+    HasDuplicate<Arr, K> extends true
+        ? `Duplicate key "${K & string}" found`
+        : Arr;

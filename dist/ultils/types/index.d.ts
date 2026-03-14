@@ -1,4 +1,5 @@
 export type { TConstructor } from "./constructor";
+export type { TDeepReadonly } from "./deepReadonly";
 export type { TEnforceUnique } from "./enforceUnique";
 export type { TError } from "./error";
 export type { ExtractTuple } from "./extractTuple";

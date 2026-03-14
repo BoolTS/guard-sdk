@@ -1,12 +1,6 @@
-type DeepReadonly<T> = T extends (...args: any[]) => any
-    ? T
-    : T extends readonly any[]
-      ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
-      : T extends object
-        ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
-        : T;
+import type { TDeepReadonly } from "../types";
 
-export function deepFreeze<const T>(obj: T): DeepReadonly<T> {
+export function deepFreeze<const T>(obj: T): TDeepReadonly<T> {
     if (typeof obj !== "object" || obj === null) return obj as any;
     Object.freeze(obj);
     for (const key of Object.keys(obj)) {
