@@ -1,0 +1,1 @@
+export { defineResources } from "./resources";
