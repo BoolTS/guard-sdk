@@ -1,1 +1,0 @@
-export { deepFreeze } from "./deepFreeze";
