@@ -1,5 +1,5 @@
 import type { TPolicyDefinition } from "../types";
 import type { TEnforceUnique } from "../ultils/types";
-export declare const definePolicies: <const K extends readonly TPolicyDefinition[]>(policies: TEnforceUnique<K, "alias">) => Readonly<{
-    policies: import("../ultils/types").TDeepReadonly<TEnforceUnique<K, "alias">>;
+export declare const definePolicies: <const T extends readonly TPolicyDefinition[]>(policies: T & TEnforceUnique<T, "alias">) => Readonly<{
+    policies: import("../ultils/types").TDeepReadonly<T & TEnforceUnique<T, "alias">>;
 }>;

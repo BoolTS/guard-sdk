@@ -1,33 +1,30 @@
-type ValuesOfKey<Arr extends any[], K extends keyof any> = Arr extends [
-    infer Head,
-    ...infer Tail
-]
-    ? Head extends Record<K, any>
-        ? [Head[K], ...ValuesOfKey<Tail, K>]
-        : ValuesOfKey<Tail, K>
-    : [];
-
-type Includes<Arr extends any[], V> = Arr extends [infer H, ...infer R]
-    ? [V] extends [H]
-        ? true
-        : Includes<R, V>
-    : false;
-
-type HasDuplicate<
+type IsDuplicated<
     Arr extends readonly any[],
-    K extends keyof any
-> = Arr extends [infer Head, ...infer Tail]
-    ? Head extends Record<K, any>
-        ? Includes<ValuesOfKey<Tail, K>, Head[K]> extends true
-            ? true
-            : HasDuplicate<Tail, K>
-        : HasDuplicate<Tail, K>
-    : false;
+    K extends string,
+    CurrentValue,
+    Index extends string
+> = {
+    [I in keyof Arr]: I extends Index
+        ? never
+        : Arr[I] extends Record<K, any>
+          ? Arr[I][K] extends CurrentValue
+              ? true
+              : never
+          : never;
+}[number] extends never
+    ? false
+    : true;
 
 export type TEnforceUnique<
     Arr extends readonly any[],
     K extends keyof Arr[number]
-> =
-    HasDuplicate<Arr, K> extends true
-        ? `Duplicate key "${K & string}" found`
-        : Arr;
+> = {
+    [I in keyof Arr]: IsDuplicated<
+        Arr,
+        K & string,
+        Arr[I] extends Record<K, any> ? Arr[I][K] : never,
+        I & string
+    > extends true
+        ? `❌ ERROR: Duplicate value "${Arr[I][K] & string}" found at key "${K & string}"`
+        : Arr[I];
+};

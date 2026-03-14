@@ -3,11 +3,10 @@ import type { TEnforceUnique } from "../ultils/types";
 
 import { deepFreeze } from "../ultils/functions";
 
-export const definePolicies = <const K extends readonly TPolicyDefinition[]>(
-    policies: TEnforceUnique<K, "alias">
+export const definePolicies = <const T extends readonly TPolicyDefinition[]>(
+    policies: T & TEnforceUnique<T, "alias">
 ) => {
     if (
-        policies === `Duplicate key "alias" found` ||
         new Set([
             ...policies
                 .map((policy) =>

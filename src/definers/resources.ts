@@ -7,10 +7,9 @@ export const defineResources = <
     const T extends readonly TResourceDefinition[],
     D extends TDeepReadonly<T>
 >(
-    resources: TEnforceUnique<T, "alias">
+    resources: T & TEnforceUnique<T, "alias">
 ) => {
     if (
-        resources === `Duplicate key "alias" found` ||
         new Set([
             ...resources
                 .map((resource) =>
@@ -24,14 +23,10 @@ export const defineResources = <
 
     const resourceFreezed = deepFreeze(resources);
 
-    if (resourceFreezed === `Duplicate key "alias" found`) {
-        throw new Error("Duplicated resource alias.");
-    }
-
     return Object.freeze({
         getResource: <
             K extends D extends never ? never : D[number]["alias"],
-            R extends D extends never ? never : Extract<D[number], { alias: K }>
+            R extends Extract<D[number], { alias: K }>
         >(
             alias: K
         ): R => {
@@ -49,10 +44,9 @@ export const defineResources = <
         },
         resources: resourceFreezed,
         definePolicies: <const K extends readonly TPolicyDefinition<T>[]>(
-            policies: TEnforceUnique<K, "alias">
+            policies: K & TEnforceUnique<K, "alias">
         ) => {
             if (
-                policies === `Duplicate key "alias" found` ||
                 new Set([
                     ...policies
                         .map((policy) =>
