@@ -141,4 +141,5 @@ vite.config.ts.timestamp-*
 # Custom
 .vscode
 .DS_Store
+.npmrc
 __test/
