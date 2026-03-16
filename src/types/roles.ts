@@ -9,7 +9,7 @@ export type TRolePermissionDefinition<
 > = {
     [R in T[number] as R["alias"]]: {
         readonly resource: R["alias"];
-        readonly actions: TOptionalTupleUnorderedNonEmpty<R["actions"]>;
+        readonly actions: "*" | TOptionalTupleUnorderedNonEmpty<R["actions"]>;
     };
 }[T[number]["alias"]];
 
